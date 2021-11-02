@@ -3,21 +3,21 @@ import logging
 from environs import Env
 from telegram.ext import CommandHandler, Updater
 
-logging.basicConfig(level=logging.INFO)
-
-env = Env()
-env.read_env()
-
-updater = Updater(token=env("BOT_TOKEN"), use_context=True)
-dispatcher = updater.dispatcher
+from termin_bot.commands import Commands, start_command
 
 
-def start(update, context):
-    context.bot.send_message(
-        chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!"
-    )
+def main():
+    logging.basicConfig(level=logging.INFO)
+
+    env = Env()
+    env.read_env()
+
+    updater = Updater(token=env("BOT_TOKEN"), use_context=True)
+    dispatcher = updater.dispatcher
+    start_handler = CommandHandler(Commands.START, start_command)
+    dispatcher.add_handler(start_handler)
+    updater.start_polling()
 
 
-start_handler = CommandHandler("start", start)
-dispatcher.add_handler(start_handler)
-updater.start_polling()
+if __name__ == "__main__":
+    main()
