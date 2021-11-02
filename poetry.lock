@@ -73,6 +73,14 @@ lint = ["mypy (==0.910)", "flake8 (==4.0.1)", "flake8-bugbear (==21.9.2)", "pre-
 tests = ["pytest", "pytz", "simplejson"]
 
 [[package]]
+name = "pony"
+version = "0.7.14"
+description = "Pony Object-Relational Mapper"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "python-dotenv"
 version = "0.19.1"
 description = "Read key-value pairs from a .env file and set them as environment variables"
@@ -165,7 +173,7 @@ test = ["pytest-mock (>=3.3)", "pytest (>=4.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "a0b0d8e4051805ca09dcf347cfea712fa1246344ff344a1611afcc6a41f1f3bc"
+content-hash = "2b505353501efc90f9bf4eb173957708d0bd28f8498efd2cf93234941bcd7a71"
 
 [metadata.files]
 apscheduler = [
@@ -187,6 +195,9 @@ environs = [
 marshmallow = [
     {file = "marshmallow-3.14.0-py3-none-any.whl", hash = "sha256:6d00e42d6d6289f8cd3e77618a01689d57a078fe324ee579b00fa206d32e9b07"},
     {file = "marshmallow-3.14.0.tar.gz", hash = "sha256:bba1a940985c052c5cc7849f97da196ebc81f3b85ec10c56ef1f3228aa9cbe74"},
+]
+pony = [
+    {file = "pony-0.7.14.tar.gz", hash = "sha256:2f01e84e79ea7a14040225cb6c079bb266e7ba147346356c266490b18c77ce82"},
 ]
 python-dotenv = [
     {file = "python-dotenv-0.19.1.tar.gz", hash = "sha256:14f8185cc8d494662683e6914addcb7e95374771e707601dfc70166946b4c4b8"},

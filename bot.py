@@ -1,9 +1,11 @@
 import logging
+from os.path import abspath
 
 from environs import Env
 from telegram.ext import CommandHandler, Updater
 
 from termin_bot.commands import Commands, command_help, command_start
+from termin_bot.models import setup_database
 
 
 def main():
@@ -11,6 +13,8 @@ def main():
 
     env = Env()
     env.read_env()
+
+    setup_database(abspath(env("DB_PATH")))
 
     updater = Updater(token=env("BOT_TOKEN"), use_context=True)
     dispatcher = updater.dispatcher
