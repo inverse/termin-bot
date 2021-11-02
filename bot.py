@@ -3,7 +3,7 @@ import logging
 from environs import Env
 from telegram.ext import CommandHandler, Updater
 
-from termin_bot.commands import Commands, start_command
+from termin_bot.commands import Commands, command_help, command_start
 
 
 def main():
@@ -14,9 +14,10 @@ def main():
 
     updater = Updater(token=env("BOT_TOKEN"), use_context=True)
     dispatcher = updater.dispatcher
-    start_handler = CommandHandler(Commands.START, start_command)
-    dispatcher.add_handler(start_handler)
+    dispatcher.add_handler(CommandHandler(Commands.START, command_start))
+    dispatcher.add_handler(CommandHandler(Commands.HELP, command_help))
     updater.start_polling()
+    updater.idle()
 
 
 if __name__ == "__main__":
