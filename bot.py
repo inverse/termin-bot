@@ -1,7 +1,7 @@
-from environs import Env
-from telegram.ext import Updater
 import logging
-from telegram.ext import CommandHandler
+
+from environs import Env
+from telegram.ext import CommandHandler, Updater
 
 logging.basicConfig(level=logging.INFO)
 
@@ -13,9 +13,11 @@ dispatcher = updater.dispatcher
 
 
 def start(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
+    context.bot.send_message(
+        chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!"
+    )
 
 
-start_handler = CommandHandler('start', start)
+start_handler = CommandHandler("start", start)
 dispatcher.add_handler(start_handler)
 updater.start_polling()
