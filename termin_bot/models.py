@@ -1,5 +1,4 @@
-import select
-from pony.orm import Database, PrimaryKey, Required, Set, select, db_session, set_sql_debug
+from pony.orm import Database, PrimaryKey, Required, Set
 
 db = Database()
 
@@ -7,7 +6,7 @@ db = Database()
 class User(db.Entity):
     id = PrimaryKey(int)
     telegram_username = Required(str, unique=True)
-    termins = Set('Termin')
+    termins = Set("Termin")
 
 
 class Termin(db.Entity):
@@ -31,7 +30,6 @@ def find_user_termins(telegram_username: str) -> list[str]:
     user = User.get(telegram_username=telegram_username)
 
     if not user:
-        raise Exception(f'No user found with username {telegram_username}')
+        raise Exception(f"No user found with username {telegram_username}")
 
     return [t.type for t in user.termins]
-
