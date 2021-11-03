@@ -2,10 +2,11 @@ import logging
 from os.path import abspath
 
 from environs import Env
+from pony.orm import db_session
 from telegram.ext import CommandHandler, Updater
 
 from termin_bot.commands import Commands, command_help, command_start
-from termin_bot.models import setup_database
+from termin_bot.models import setup_database, find_user_termins, find_users_for_termin_type, User, Termin
 
 
 def main():
