@@ -6,7 +6,7 @@ from telegram.ext import CommandHandler, Updater
 
 from termin_bot.commands import (Commands, command_list, command_start,
                                  command_subscribe, command_subscriptions,
-                                 command_unsubscribe)
+                                 command_uninstall, command_unsubscribe)
 from termin_bot.models import setup_database
 
 
@@ -27,6 +27,7 @@ def main():
     dispatcher.add_handler(
         CommandHandler(Commands.SUBSCRIPTIONS, command_subscriptions)
     )
+    dispatcher.add_handler(CommandHandler(Commands.UNINSTALL, command_uninstall))
     updater.start_polling()
     updater.idle()
 

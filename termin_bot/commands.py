@@ -29,6 +29,7 @@ class Commands:
     SUBSCRIBE = "subscribe"
     UNSUBSCRIBE = "unsubscribe"
     SUBSCRIPTIONS = "subscriptions"
+    UNINSTALL = "uninstall"
 
 
 def command_start(update: Update, _context: CallbackContext):
@@ -41,13 +42,12 @@ Welcome to the Berlin Termin Bot\!
 
 A place where you can get notified for free appointments on the Berlin Services website\.
 
-Start by issuing `/list` to see available appointment types\.
-
-Then subscribe with `/subscribe <appointment>`\.
-
-To unregister use `/unregister <appointment`\.
-
-To list your subscriptions use `/subscribed`
+Available commands:
+\- `/list` \- see available appointment
+\- `/subscribe` \- subscribe to appointment
+\- `/unsubscribe` \- unsubscribe from an appointment
+\- `/subscribed` \- view your subscriptions
+\- `/uninstall` \- remove all saved state
     """
 
     update.message.reply_markdown_v2(welcome_text)
@@ -101,4 +101,8 @@ def command_unsubscribe(update: Update, context: CallbackContext):
 
 
 def command_subscriptions(update: Update, _context: CallbackContext):
+    update.message.reply_text("Coming soon...")
+
+
+def command_uninstall(update: Update, _context: CallbackContext):
     update.message.reply_text("Coming soon...")
