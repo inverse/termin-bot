@@ -1,5 +1,8 @@
+from pony.orm import db_session
 from telegram import Update
 from telegram.ext import CallbackContext
+
+from termin_bot import model
 
 
 class Appointments:
@@ -101,8 +104,30 @@ def command_unsubscribe(update: Update, context: CallbackContext):
 
 
 def command_subscriptions(update: Update, _context: CallbackContext):
-    update.message.reply_text("Coming soon...")
+    telegram_username = update.effective_user.username
+    termins = model.find_user_appointments(telegram_username)
+
+    subscriptions = ""
+    for termin in termins:
+        subscriptions += f"\- `{termin}`\n"
+
+    termins_text = f"""
+Here are all your subscriptions:
+
+{subscriptions}
+    """
+
+    update.message.reply_markdown_v2(termins_text)
 
 
 def command_uninstall(update: Update, _context: CallbackContext):
-    update.message.reply_text("Coming soon...")
+    telegram_username = update.effective_user.username
+
+    try:
+        model.delete_user(telegram_username)
+    except ValueError:
+        pass
+
+    update.message.reply_markdown_v2(
+        f"Successfully removed all data about `{telegram_username}`"
+    )

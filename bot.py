@@ -7,7 +7,7 @@ from telegram.ext import CommandHandler, Updater
 from termin_bot.commands import (Commands, command_list, command_start,
                                  command_subscribe, command_subscriptions,
                                  command_uninstall, command_unsubscribe)
-from termin_bot.models import setup_database
+from termin_bot.model import setup_database
 
 
 def main():
