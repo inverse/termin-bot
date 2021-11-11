@@ -3,13 +3,13 @@ from pony.orm import Database, PrimaryKey, Required, Set, db_session
 db = Database()
 
 
-class User(db.Entity):
+class User(db.Entity):  # type: ignore
     id = PrimaryKey(int, auto=True)
     telegram_username = Required(str, unique=True)
     termins = Set("Termin")
 
 
-class Termin(db.Entity):
+class Termin(db.Entity):  # type: ignore
     id = PrimaryKey(int, auto=True)
     user = Required(User)
     appointment = Required(str)
