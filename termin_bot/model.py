@@ -56,6 +56,11 @@ def find_user(telegram_username: str) -> User:
     return _find_user(telegram_username)
 
 
+@db_session
+def find_appointments() -> list[str]:
+    return [t.appointment for t in Termin.select()]
+
+
 def _find_user(telegram_username: str) -> User:
     user = User.get(telegram_username=telegram_username)
 
