@@ -45,3 +45,7 @@ class TestModels(unittest.TestCase):
         model.delete_user(self.TEST_TELEGRAM_USERNAME)
         with self.assertRaises(ValueError):
             model.find_user(self.TEST_TELEGRAM_USERNAME)
+
+    def test_find_appointments(self):
+        result = model.find_appointments()
+        self.assertTrue(len(result) == 2)

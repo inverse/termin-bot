@@ -1,9 +1,6 @@
-import logging
-from os.path import abspath
-
-from environs import Env
 from telegram.ext import CommandHandler, Updater
 
+from termin_bot import common
 from termin_bot.commands import (
     Commands,
     command_list,
@@ -13,17 +10,11 @@ from termin_bot.commands import (
     command_uninstall,
     command_unsubscribe,
 )
-from termin_bot.model import setup_database
 
 
 def main():
-    logging.basicConfig(level=logging.INFO)
-
-    env = Env()
-    env.read_env()
-
-    setup_database(abspath(env("DB_PATH")))
-
+    common.bootstrap()
+    env = common.get_env()
     updater = Updater(token=env("BOT_TOKEN"), use_context=True)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler(Commands.START, command_start))
