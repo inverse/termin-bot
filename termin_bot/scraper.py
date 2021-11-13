@@ -21,3 +21,7 @@ def fetch_available_appointments(appointments: List[str]) -> List[AppointmentRes
 
 def scrape(appointment: str) -> List[datetime]:
     return []
+
+
+def scrape_appointments():
+    pass
