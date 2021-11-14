@@ -35,8 +35,8 @@ class TestModels(unittest.TestCase):
     def test_find_user_termins(self):
         result = model.find_user_appointments(self.TEST_TELEGRAM_USERNAME)
         self.assertTrue(len(result) == 2)
-        self.assertEqual(self.TEST_APPOINTMENT_1, result[0])
-        self.assertEqual(self.TEST_APPOINTMENT_2, result[1])
+        self.assertTrue(self.TEST_APPOINTMENT_1 in result)
+        self.assertTrue(self.TEST_APPOINTMENT_2 in result)
 
     def test_remove_user_appointment(self):
         model.remove_user_appointment(
