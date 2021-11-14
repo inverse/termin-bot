@@ -1,9 +1,8 @@
 from datetime import datetime
 from typing import List
 
-from scraper import AppointmentResult
-
 from termin_bot import model, scraper
+from termin_bot.scraper import AppointmentResult
 
 
 def handle_appointments(appointments: List[str]):

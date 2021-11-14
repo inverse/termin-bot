@@ -1,6 +1,17 @@
+import logging
+import urllib
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List
+
+import requests
+from bs4 import BeautifulSoup
+
+APPOINTMENTS_URL = "https://service.berlin.de/dienstleistungen/"
+BOOKABLE_TEXT = "Termin berlinweit suchen"
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -24,4 +35,27 @@ def scrape(appointment: str) -> List[datetime]:
 
 
 def scrape_appointments():
-    pass
+    response = requests.get(APPOINTMENTS_URL)
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    azlist = soup.find(class_="azlist")
+    anchors = azlist.find_all("a")
+
+    appointments_urls = {}
+    for anchor in anchors:
+        appointment_url = urllib.parse.urljoin(APPOINTMENTS_URL, anchor["href"])
+        appointment_label = anchor.string
+        appointments_urls[appointment_url] = appointment_label
+
+    logger.info(f"Found {len(appointments_urls)} appointment URls")
+    for appointment_url in list(appointments_urls)[:5]:
+        if not is_appointment_bookable(appointment_url):
+            del appointments_urls[appointment_url]
+
+    logger.info(f"Found bookable {len(appointments_urls)} appointment URls")
+
+
+def is_appointment_bookable(appointment_url: str) -> bool:
+    response = requests.get(appointment_url)
+
+    return BOOKABLE_TEXT in response.text
