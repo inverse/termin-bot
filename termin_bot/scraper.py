@@ -55,6 +55,7 @@ def scrape_appointments():
     logger.info(f"Found bookable {len(appointments_urls)} appointment URls")
 
 
+
 def is_appointment_bookable(appointment_url: str) -> bool:
     response = requests.get(appointment_url)
 
