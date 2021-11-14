@@ -1,4 +1,5 @@
-from pony.orm import db_session
+from typing import Dict
+
 from telegram import Update
 from telegram.ext import CallbackContext
 
@@ -6,24 +7,17 @@ from termin_bot import model
 
 
 class Appointments:
-    APPOINTMENTS = [
-        "Anmeldung einer Wohnung 1",
-        "Anmeldung einer Wohnung 2",
-    ]
+    def __init__(self, data: Dict[str, str]):
+        self.data = data
 
     def get_commands(self) -> list:
-        return [
-            appointment.replace(" ", "_").lower() for appointment in self.APPOINTMENTS
-        ]
+        return list(self.data.keys())
 
     def get_commands_dict(self) -> dict:
-        return {
-            appointment.replace(" ", "_").lower(): appointment
-            for appointment in self.APPOINTMENTS
-        }
+        return self.data
 
 
-APPOINTMENTS = Appointments()
+APPOINTMENTS = Appointments(model.fetch_appointments())
 
 
 class Commands:

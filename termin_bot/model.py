@@ -1,3 +1,5 @@
+from typing import Dict
+
 from pony.orm import Database, PrimaryKey, Required, Set, db_session
 
 db = Database()
@@ -66,6 +68,19 @@ def find_user(telegram_username: str) -> User:
 @db_session
 def find_appointments() -> list[str]:
     return [t.appointment for t in Termin.select()]
+
+
+@db_session
+def update_appointments(appointments: Dict[str, str]):
+    for appointment_label in appointments.values():
+        appointment_name = appointment_label.lower().replace(" ", "_")
+        Appointment(name=appointment_name, label=appointment_label)
+        db.commit()
+
+
+@db_session
+def fetch_appointments() -> Dict[str, str]:
+    return {a.name: a.label for a in Appointment.select()}
 
 
 def _find_user(telegram_username: str) -> User:

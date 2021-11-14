@@ -1,8 +1,8 @@
 import logging
-import urllib
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List
+from typing import Dict, List
+from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
@@ -34,25 +34,26 @@ def scrape(appointment: str) -> List[datetime]:
     return []
 
 
-def scrape_appointments():
+def scrape_appointments() -> Dict[str, str]:
     response = requests.get(APPOINTMENTS_URL)
     soup = BeautifulSoup(response.text, "html.parser")
 
     azlist = soup.find(class_="azlist")
     anchors = azlist.find_all("a")
 
-    appointments_urls = {}
+    appointments = {}
     for anchor in anchors:
-        appointment_url = urllib.parse.urljoin(APPOINTMENTS_URL, anchor["href"])
+        appointment_url = urljoin(APPOINTMENTS_URL, anchor["href"])
         appointment_label = anchor.string
-        appointments_urls[appointment_url] = appointment_label
+        appointments[appointment_url] = appointment_label.strip()
 
-    logger.info(f"Found {len(appointments_urls)} appointment URls")
-    for appointment_url in list(appointments_urls)[:5]:
+    logger.info(f"Found {len(appointments)} appointment URls")
+    for appointment_url in list(appointments)[:5]:
         if not is_appointment_bookable(appointment_url):
-            del appointments_urls[appointment_url]
+            del appointments[appointment_url]
 
-    logger.info(f"Found bookable {len(appointments_urls)} appointment URls")
+    logger.info(f"Found bookable {len(appointments)} appointment URls")
+    return appointments
 
 
 def is_appointment_bookable(appointment_url: str) -> bool:

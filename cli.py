@@ -12,7 +12,8 @@ def cli():
 def scrape_appointments():
     """Scrape available appointments."""
     click.echo("Started scraping appointments")
-    scraper.scrape_appointments()
+    appointments = scraper.scrape_appointments()
+    model.update_appointments(appointments)
     click.echo("Finished scraping  appointments")
 
 
