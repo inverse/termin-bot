@@ -48,8 +48,11 @@ def scrape_appointments() -> Dict[str, str]:
         appointments[appointment_url] = appointment_label.strip()
 
     logger.info(f"Found {len(appointments)} appointment URls")
-    for appointment_url in list(appointments)[:5]:
+    for appointment_url in list(appointments):
+        logger.debug(f"Processing: {appointment_url}")
         if not is_appointment_bookable(appointment_url):
+            logger.debug(f"Removed: {appointment_url}")
+
             del appointments[appointment_url]
 
     logger.info(f"Found bookable {len(appointments)} appointment URls")
