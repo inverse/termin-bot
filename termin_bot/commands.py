@@ -59,9 +59,6 @@ def command_list(update: Update, _context: CallbackContext):
 Here are the available types:
 {type_text}
     """
-
-    print(list_text)
-
     update.message.reply_markdown_v2(_format_text(list_text))
 
 
