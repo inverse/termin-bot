@@ -12,6 +12,8 @@ APPOINTMENTS_URL = "https://service.berlin.de/dienstleistungen/"
 BOOKABLE_TEXT = "Termin berlinweit suchen"
 URL_PATTERN = re.compile(r"^https://service.berlin.de/dienstleistung/\d+/$")
 
+BOOKABLE_CLASS = "buchbar"
+
 logger = logging.getLogger(__name__)
 
 
@@ -35,7 +37,18 @@ def scrape(appointment: str) -> List[datetime]:
     response = requests.get(appointment)
     soup = BeautifulSoup(response.text, "html.parser")
 
-    return []
+    result = []
+    for cal_table in soup.find_all(class_="calendar-month-table"):
+        for cell in cal_table.find_all("td"):
+            if "class" not in cell.attrs:
+                continue
+
+            if BOOKABLE_CLASS not in cell.attrs["class"]:
+                continue
+
+            result.append(datetime.now())  ## TODO Contruct URL
+
+    return result
 
 
 @dataclass

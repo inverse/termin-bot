@@ -9,6 +9,7 @@ from .utils import load_fixture
 
 
 class ScraperTest(unittest.TestCase):
+    @responses.activate
     @patch("termin_bot.scraper.is_appointment_bookable")
     def test_scrape_appointments(self, mock_is_appointment_bookable: Mock):
         responses.add(
@@ -22,6 +23,7 @@ class ScraperTest(unittest.TestCase):
 
         self.assertTrue(True)
 
+    @responses.activate
     def test_is_appointment_bookable(self):
         responses.add(
             responses.GET,
@@ -34,6 +36,7 @@ class ScraperTest(unittest.TestCase):
             )
         )
 
+    @responses.activate
     def test_scrape(self):
         responses.add(
             responses.GET,
@@ -41,4 +44,7 @@ class ScraperTest(unittest.TestCase):
             body=load_fixture("appointment_termin.html"),
         )
 
-        scraper.scrape("https://service.berlin.de/terminvereinbarung/termin/day/") # TODO: Redirect needs to be handled
+        result = scraper.scrape(
+            "https://service.berlin.de/terminvereinbarung/termin/day/"
+        )  # TODO: Redirect needs to be handled
+        self.assertEqual([], result)
