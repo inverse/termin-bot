@@ -24,10 +24,14 @@ class TestModels(unittest.TestCase):
         with db_session:
             user = model.User(telegram_username=self.TEST_TELEGRAM_USERNAME)
             appointment_1 = model.Appointment(
-                name=self.TEST_APPOINTMENT_1, label="Something Important 1"
+                name=self.TEST_APPOINTMENT_1,
+                label="Something Important 1",
+                identifier=123,
             )
             appointment_2 = model.Appointment(
-                name=self.TEST_APPOINTMENT_2, label="Something Important 2"
+                name=self.TEST_APPOINTMENT_2,
+                label="Something Important 2",
+                identifier=124,
             )
             model.Termin(appointment=appointment_1, user=user)
             model.Termin(appointment=appointment_2, user=user)

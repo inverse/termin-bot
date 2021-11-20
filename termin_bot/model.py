@@ -1,6 +1,8 @@
-from typing import Dict
+from typing import Dict, List
 
 from pony.orm import Database, PrimaryKey, Required, Set, db_session
+
+from termin_bot.scraper import ScrapedAppointment
 
 db = Database()
 
@@ -15,6 +17,7 @@ class Appointment(db.Entity):  # type: ignore
     id = PrimaryKey(int, auto=True)
     name = Required(str)
     label = Required(str)
+    identifier = Required(int)
     users = Set("Termin")
 
 
@@ -71,10 +74,13 @@ def find_appointments() -> list[str]:
 
 
 @db_session
-def update_appointments(appointments: Dict[str, str]):
-    for appointment_label in appointments.values():
-        appointment_name = appointment_label.lower().replace(" ", "_")
-        Appointment(name=appointment_name, label=appointment_label)
+def update_appointments(appointments: List[ScrapedAppointment]):
+    for appointment in appointments:
+        Appointment(
+            name=appointment.name,
+            label=appointment.label,
+            identifier=appointment.identifier,
+        )
         db.commit()
 
 
