@@ -11,8 +11,11 @@ from .utils import load_fixture
 class ScraperTest(unittest.TestCase):
     @patch("termin_bot.scraper.is_appointment_bookable")
     def test_scrape_appointments(self, mock_is_appointment_bookable: Mock):
-        fixture = load_fixture("dienstleistungen.html")
-        responses.add(responses.GET, scraper.APPOINTMENTS_URL, body=fixture)
+        responses.add(
+            responses.GET,
+            scraper.APPOINTMENTS_URL,
+            body=load_fixture("dienstleistungen.html"),
+        )
 
         mock_is_appointment_bookable.return_value = True
         scraper.scrape_appointments()
@@ -20,14 +23,22 @@ class ScraperTest(unittest.TestCase):
         self.assertTrue(True)
 
     def test_is_appointment_bookable(self):
-        fixture = load_fixture("bookable_appointment.html")
         responses.add(
             responses.GET,
             "https://service.berlin.de/dienstleistung/120335/",
-            body=fixture,
+            body=load_fixture("bookable_appointment.html"),
         )
         self.assertTrue(
             scraper.is_appointment_bookable(
                 "https://service.berlin.de/dienstleistung/120335/"
             )
         )
+
+    def test_scrape(self):
+        responses.add(
+            responses.GET,
+            "https://service.berlin.de/terminvereinbarung/termin/day/",
+            body=load_fixture("appointment_termin.html"),
+        )
+
+        scraper.scrape("https://service.berlin.de/terminvereinbarung/termin/day/") # TODO: Redirect needs to be handled

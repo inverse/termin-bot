@@ -32,6 +32,9 @@ def fetch_available_appointments(appointments: List[str]) -> List[AppointmentRes
 
 
 def scrape(appointment: str) -> List[datetime]:
+    response = requests.get(appointment)
+    soup = BeautifulSoup(response.text, "html.parser")
+
     return []
 
 
