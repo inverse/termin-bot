@@ -44,6 +44,11 @@ class ScraperTest(unittest.TestCase):
             "https://service.berlin.de/terminvereinbarung/termin/day/",
             body=load_fixture("appointment_termin.html"),
         )
+        responses.add(
+            responses.GET,
+            "https://service.berlin.de/terminvereinbarung/termin/day/1638313200/",
+            body=load_fixture("appointment_termin_next.html"),
+        )
 
         result = scraper.scrape(
             "https://service.berlin.de/terminvereinbarung/termin/day/"
@@ -51,6 +56,7 @@ class ScraperTest(unittest.TestCase):
         self.assertEqual(
             [
                 datetime.datetime(2021, 11, 23, 0, 0),
+                datetime.datetime(2022, 1, 7, 0, 0),
                 datetime.datetime(2021, 12, 7, 0, 0),
             ],
             result,

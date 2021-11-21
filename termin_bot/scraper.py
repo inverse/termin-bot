@@ -35,13 +35,17 @@ def fetch_available_appointments(appointments: List[str]) -> List[AppointmentRes
     return results
 
 
-def scrape(appointment: str) -> List[datetime]:
-    response = requests.get(appointment)
+def scrape(url: str) -> List[datetime]:
+    response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
 
     result = []
     for cal_table in soup.find_all(class_="calendar-month-table"):
         month_year = month_convert(cal_table.find(class_="month").string.strip())
+        next_element = cal_table.find(class_="next")
+        if next_element and next_element.find("a"):
+            result += scrape(next_element.find("a")["href"])
+
         for cell in cal_table.find_all("td"):
             if "class" not in cell.attrs:
                 continue
