@@ -1,3 +1,4 @@
+import datetime
 import unittest
 from unittest.mock import Mock, patch
 
@@ -47,4 +48,10 @@ class ScraperTest(unittest.TestCase):
         result = scraper.scrape(
             "https://service.berlin.de/terminvereinbarung/termin/day/"
         )  # TODO: Redirect needs to be handled
-        self.assertEqual([], result)
+        self.assertEqual(
+            [
+                datetime.datetime(2021, 11, 23, 0, 0),
+                datetime.datetime(2021, 12, 7, 0, 0),
+            ],
+            result,
+        )

@@ -2,11 +2,13 @@ import logging
 import re
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List
+from typing import List
 from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
+
+from termin_bot.util import month_convert
 
 APPOINTMENTS_URL = "https://service.berlin.de/dienstleistungen/"
 BOOKABLE_TEXT = "Termin berlinweit suchen"
@@ -39,6 +41,7 @@ def scrape(appointment: str) -> List[datetime]:
 
     result = []
     for cal_table in soup.find_all(class_="calendar-month-table"):
+        month_year = month_convert(cal_table.find(class_="month").string.strip())
         for cell in cal_table.find_all("td"):
             if "class" not in cell.attrs:
                 continue
@@ -46,7 +49,8 @@ def scrape(appointment: str) -> List[datetime]:
             if BOOKABLE_CLASS not in cell.attrs["class"]:
                 continue
 
-            result.append(datetime.now())  ## TODO Contruct URL
+            date_string = f"{cell.string.strip()} {month_year}"
+            result.append(datetime.strptime(date_string, "%d %B %Y"))
 
     return result
 
