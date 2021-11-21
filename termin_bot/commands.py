@@ -1,4 +1,5 @@
-from pony.orm import db_session
+from typing import Dict
+
 from telegram import Update
 from telegram.ext import CallbackContext
 
@@ -6,24 +7,17 @@ from termin_bot import model
 
 
 class Appointments:
-    APPOINTMENTS = [
-        "Anmeldung einer Wohnung 1",
-        "Anmeldung einer Wohnung 2",
-    ]
+    def __init__(self, data: Dict[str, str]):
+        self.data = data
 
     def get_commands(self) -> list:
-        return [
-            appointment.replace(" ", "_").lower() for appointment in self.APPOINTMENTS
-        ]
+        return list(self.data.keys())
 
     def get_commands_dict(self) -> dict:
-        return {
-            appointment.replace(" ", "_").lower(): appointment
-            for appointment in self.APPOINTMENTS
-        }
+        return self.data
 
 
-APPOINTMENTS = Appointments()
+APPOINTMENTS = Appointments(model.fetch_appointments())
 
 
 class Commands:
@@ -57,17 +51,15 @@ Available commands:
 
 
 def command_list(update: Update, _context: CallbackContext):
-
     type_text = ""
     for command, label in APPOINTMENTS.get_commands_dict().items():
-        type_text += f"\- `{command}` \({label}\)\n"
+        type_text += f"- `{command}` ({label})\n"
 
     list_text = f"""
 Here are the available types:
 {type_text}
     """
-
-    update.message.reply_markdown_v2(list_text)
+    update.message.reply_markdown_v2(_format_text(list_text))
 
 
 def command_subscribe(update: Update, context: CallbackContext):
@@ -109,7 +101,7 @@ def command_subscriptions(update: Update, _context: CallbackContext):
 
     subscriptions = ""
     for termin in termins:
-        subscriptions += f"\- `{termin}`\n"
+        subscriptions += f"- `{termin}`\n"
 
     termins_text = f"""
 Here are all your subscriptions:
@@ -117,7 +109,7 @@ Here are all your subscriptions:
 {subscriptions}
     """
 
-    update.message.reply_markdown_v2(termins_text)
+    update.message.reply_markdown_v2(_format_text(termins_text))
 
 
 def command_uninstall(update: Update, _context: CallbackContext):
@@ -131,3 +123,11 @@ def command_uninstall(update: Update, _context: CallbackContext):
     update.message.reply_markdown_v2(
         f"Successfully removed all data about `{telegram_username}`"
     )
+
+
+def _format_text(text: str) -> str:
+    text = text.replace("-", "\-")
+    text = text.replace("(", "\(")
+    text = text.replace(")", "\)")
+    text = text.replace(".", "\.")
+    return text

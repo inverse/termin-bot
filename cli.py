@@ -1,11 +1,20 @@
 import click
 
-from termin_bot import appointment_handler, common, model
+from termin_bot import appointment_handler, common, model, scraper
 
 
 @click.group()
 def cli():
     pass
+
+
+@cli.command()
+def scrape_appointments():
+    """Scrape available appointments."""
+    click.echo("Started scraping appointments")
+    appointments = scraper.scrape_appointments()
+    model.update_appointments(appointments)
+    click.echo("Finished scraping  appointments")
 
 
 @cli.command()

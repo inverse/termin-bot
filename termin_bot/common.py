@@ -12,8 +12,16 @@ def get_env() -> Env:
     return env
 
 
+def is_debug() -> bool:
+    env = get_env()
+    return env.bool("DEBUG", False)
+
+
 def bootstrap():
-    logging.basicConfig(level=logging.INFO)
+    log_level = logging.DEBUG if is_debug() else logging.INFO
+    logging.basicConfig(level=log_level)
+
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
 
     env = get_env()
     setup_database(abspath(env("DB_PATH")))

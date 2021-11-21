@@ -1,15 +1,6 @@
 from telegram.ext import CommandHandler, Updater
 
 from termin_bot import common
-from termin_bot.commands import (
-    Commands,
-    command_list,
-    command_start,
-    command_subscribe,
-    command_subscriptions,
-    command_uninstall,
-    command_unsubscribe,
-)
 
 
 def main():
@@ -17,6 +8,16 @@ def main():
     env = common.get_env()
     updater = Updater(token=env("BOT_TOKEN"), use_context=True)
     dispatcher = updater.dispatcher
+    from termin_bot.commands import (
+        Commands,
+        command_list,
+        command_start,
+        command_subscribe,
+        command_subscriptions,
+        command_uninstall,
+        command_unsubscribe,
+    )
+
     dispatcher.add_handler(CommandHandler(Commands.START, command_start))
     dispatcher.add_handler(CommandHandler(Commands.LIST, command_list))
     dispatcher.add_handler(CommandHandler(Commands.SUBSCRIBE, command_subscribe))

@@ -23,14 +23,24 @@ class TestModels(unittest.TestCase):
         setup_test_database(model.db)
         with db_session:
             user = model.User(telegram_username=self.TEST_TELEGRAM_USERNAME)
-            model.Termin(appointment=self.TEST_APPOINTMENT_1, user=user)
-            model.Termin(appointment=self.TEST_APPOINTMENT_2, user=user)
+            appointment_1 = model.Appointment(
+                name=self.TEST_APPOINTMENT_1,
+                label="Something Important 1",
+                identifier=123,
+            )
+            appointment_2 = model.Appointment(
+                name=self.TEST_APPOINTMENT_2,
+                label="Something Important 2",
+                identifier=124,
+            )
+            model.Termin(appointment=appointment_1, user=user)
+            model.Termin(appointment=appointment_2, user=user)
 
     def test_find_user_termins(self):
         result = model.find_user_appointments(self.TEST_TELEGRAM_USERNAME)
         self.assertTrue(len(result) == 2)
-        self.assertEqual(self.TEST_APPOINTMENT_1, result[1])
-        self.assertEqual(self.TEST_APPOINTMENT_2, result[0])
+        self.assertTrue(self.TEST_APPOINTMENT_1 in result)
+        self.assertTrue(self.TEST_APPOINTMENT_2 in result)
 
     def test_remove_user_appointment(self):
         model.remove_user_appointment(
