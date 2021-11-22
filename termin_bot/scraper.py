@@ -21,14 +21,14 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class AppointmentResult:
-    appointment: str
+    appointment_identifier: int
     dates: List[datetime]
 
 
-def fetch_available_appointments(appointments: List[str]) -> List[AppointmentResult]:
+def fetch_available_appointments(appointments: List[int]) -> List[AppointmentResult]:
     results = []
     for appointment in appointments:
-        free_appointments = scrape(appointment)
+        free_appointments = scrape(f"{APPOINTMENTS_URL}{appointment}")
         if len(free_appointments) != 0:
             results.append(AppointmentResult(appointment, free_appointments))
 
