@@ -9,7 +9,7 @@ db = Database()
 
 class User(db.Entity):  # type: ignore
     id = PrimaryKey(int, auto=True)
-    telegram_username = Required(str, unique=True)
+    telegram_id = Required(int, unique=True)
     termins = Set("Termin")
 
 
@@ -45,32 +45,32 @@ def find_users_for_appointment(appointment_identifier: int) -> list[User]:
 
 
 @db_session
-def find_user_appointments(telegram_username: str) -> List[str]:
-    user = find_user(telegram_username)
+def find_user_appointments(telegram_id: int) -> List[str]:
+    user = find_user(telegram_id)
 
     return [t.appointment.name for t in user.termins]
 
 
 @db_session
-def remove_user_appointment(telegram_username: str, appointment: str):
-    user = find_user(telegram_username)
+def remove_user_appointment(telegram_id: int, appointment: str):
+    user = find_user(telegram_id)
     for termin in user.termins:
         if appointment == termin.appointment.name:
             termin.delete()
 
 
 @db_session
-def delete_user(telegram_username: str):
+def delete_user(telegram_id: int):
     try:
-        user = User.get(telegram_username=telegram_username)
+        user = User.get(telegram_id=telegram_id)
         user.delete()
     except ValueError:
         pass
 
 
 @db_session
-def find_user(telegram_username: str) -> User:
-    return _find_user(telegram_username)
+def find_user(telegram_id: int) -> User:
+    return _find_user(telegram_id)
 
 
 @db_session
@@ -94,10 +94,10 @@ def fetch_appointments() -> Dict[str, str]:
     return {a.name: a.label for a in Appointment.select()}
 
 
-def _find_user(telegram_username: str) -> User:
-    user = User.get(telegram_username=telegram_username)
+def _find_user(telegram_id: int) -> User:
+    user = User.get(telegram_id=telegram_id)
 
     if not user:
-        raise ValueError(f"No user found with username {telegram_username}")
+        raise ValueError(f"No user found with username {telegram_id}")
 
     return user
