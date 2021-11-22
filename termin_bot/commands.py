@@ -121,7 +121,7 @@ def command_uninstall(update: Update, _context: CallbackContext):
         pass
 
     update.message.reply_markdown_v2(
-        f"Successfully removed all data about `{telegram_id}`"
+        f"Successfully removed all data about you"
     )
 
 
