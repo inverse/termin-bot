@@ -87,15 +87,17 @@ def scrape_appointments() -> List[ScrapedAppointment]:
         identifier = int(split)
         appointments.append(ScrapedAppointment(url, label, name, identifier))
 
-    logger.info(f"Found {len(appointments)} appointment URls")
+    total_appointments = len(appointments)
+    logger.info(f"Found {total_appointments} appointment URls")
     for index, appointment in enumerate(appointments):
-        logger.debug(f"Processing: {appointment.url}")
+        logger.debug(f"Processing: [{index}/{total_appointments}] {appointment.url}")
         if not is_appointment_bookable(appointment.url):
             logger.debug(f"Removed: {appointment.url}")
 
             del appointments[index]
 
-    logger.info(f"Found bookable {len(appointments)} appointment URls")
+    total_appointments = len(appointments)
+    logger.info(f"Found bookable {total_appointments} appointment URls")
     return appointments
 
 

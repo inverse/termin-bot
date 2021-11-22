@@ -96,8 +96,8 @@ def command_unsubscribe(update: Update, context: CallbackContext):
 
 
 def command_subscriptions(update: Update, _context: CallbackContext):
-    telegram_username = update.effective_user.username
-    termins = model.find_user_appointments(telegram_username)
+    telegram_id = update.effective_user.id
+    termins = model.find_user_appointments(telegram_id)
 
     subscriptions = ""
     for termin in termins:
@@ -113,15 +113,15 @@ Here are all your subscriptions:
 
 
 def command_uninstall(update: Update, _context: CallbackContext):
-    telegram_username = update.effective_user.username
+    telegram_id = update.effective_user.id
 
     try:
-        model.delete_user(telegram_username)
+        model.delete_user(telegram_id)
     except ValueError:
         pass
 
     update.message.reply_markdown_v2(
-        f"Successfully removed all data about `{telegram_username}`"
+        f"Successfully removed all data about `{telegram_id}`"
     )
 
 

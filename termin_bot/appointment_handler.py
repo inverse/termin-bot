@@ -14,7 +14,7 @@ def handle_appointments(appointments: List[int]):
 def process_appointment_result(result: AppointmentResult):
     users = model.find_users_for_appointment(result.appointment_identifier)
     for user in users:
-        notify_user(user.telegram_username, result.dates)
+        notify_user(user.telegram_id, result.dates)
 
 
 def notify_user(user: str, dates: List[datetime]):
