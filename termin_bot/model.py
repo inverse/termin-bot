@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from pony.orm import Database, PrimaryKey, Required, Set, db_session
+from pony.orm import Database, PrimaryKey, Required, Set, db_session, select
 
 from termin_bot.scraper import ScrapedAppointment
 
@@ -17,7 +17,7 @@ class Appointment(db.Entity):  # type: ignore
     id = PrimaryKey(int, auto=True)
     name = Required(str)
     label = Required(str)
-    identifier = Required(int)
+    identifier = Required(int, unique=True)
     users = Set("Termin")
 
 
@@ -33,14 +33,19 @@ def setup_database(location: str):
 
 
 @db_session
-def find_users_for_appointment(appointment: str) -> list[str]:
-    users = User.select(lambda u: appointment in u.termins.type)
+def find_users_for_appointment(appointment_identifier: int) -> list[User]:
+    query = select(
+        u
+        for u in User  # type: ignore
+        for t in u.termins
+        if t.appointment.identifier == appointment_identifier
+    )
 
-    return [u.telegram_username for u in users]
+    return query.fetch()
 
 
 @db_session
-def find_user_appointments(telegram_username: str) -> list[str]:
+def find_user_appointments(telegram_username: str) -> List[str]:
     user = find_user(telegram_username)
 
     return [t.appointment.name for t in user.termins]
@@ -69,8 +74,8 @@ def find_user(telegram_username: str) -> User:
 
 
 @db_session
-def find_appointments() -> list[str]:
-    return [t.appointment for t in Termin.select()]
+def find_appointments() -> List[int]:
+    return [t.appointment.identifier for t in Termin.select()]
 
 
 @db_session
