@@ -120,9 +120,7 @@ def command_uninstall(update: Update, _context: CallbackContext):
     except ValueError:
         pass
 
-    update.message.reply_markdown_v2(
-        f"Successfully removed all data about you"
-    )
+    update.message.reply_markdown_v2(f"Successfully removed all data about you")
 
 
 def _format_text(text: str) -> str:
