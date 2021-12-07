@@ -2,7 +2,7 @@ from typing import Dict, List, Optional
 
 from pony.orm import Database, PrimaryKey, Required, Set, db_session, select
 
-from termin_bot.exceptions import MaxTerminException, NoUserException
+from termin_bot.exceptions import MaxTerminException
 from termin_bot.scraper import ScrapedAppointment
 
 MAX_TERMINS = 3
@@ -52,6 +52,9 @@ def find_users_for_appointment(appointment_identifier: int) -> list[User]:
 def find_user_appointments(telegram_id: int) -> List[str]:
     user = _find_user(telegram_id)
 
+    if not user:
+        return []
+
     return [t.appointment.name for t in user.termins]
 
 
@@ -91,7 +94,7 @@ def delete_user(telegram_id: int):
 
 
 @db_session
-def find_user(telegram_id: int) -> User:
+def find_user(telegram_id: int) -> Optional[User]:
     return _find_user(telegram_id)
 
 

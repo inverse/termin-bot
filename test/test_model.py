@@ -4,7 +4,7 @@ from importlib import reload
 from pony.orm import Database, db_session
 
 from termin_bot import model
-from termin_bot.exceptions import MaxTerminException, NoUserException
+from termin_bot.exceptions import MaxTerminException
 
 
 def setup_test_database(db: Database):
