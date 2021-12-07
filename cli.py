@@ -1,8 +1,10 @@
 import click
+from pony.orm import db_session
 
 from termin_bot import appointment_handler, common, model, scraper
 
 
+@db_session
 @click.group()
 def cli():
     pass

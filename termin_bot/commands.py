@@ -99,11 +99,11 @@ def command_unsubscribe(update: Update, context: CallbackContext):
 
 def command_subscriptions(update: Update, _context: CallbackContext):
     telegram_id = update.effective_user.id
-    termins = model.find_user_appointments(telegram_id)
+    termins = model.find_user_subscriptions(telegram_id)
 
     subscriptions = ""
     for termin in termins:
-        subscriptions += f"- `{termin}`\n"
+        subscriptions += f"- `{termin.label}` ({termin.name})\n"
 
     termins_text = f"""
 Here are all your subscriptions:

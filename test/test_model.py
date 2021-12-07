@@ -12,6 +12,7 @@ def setup_test_database(db: Database):
     db.generate_mapping(create_tables=True)
 
 
+@db_session
 class TestModels(unittest.TestCase):
 
     TEST_TELEGRAM_ID = 123456789
@@ -26,38 +27,37 @@ class TestModels(unittest.TestCase):
     def setUp(self) -> None:
         reload(model)
         setup_test_database(model.db)
-        with db_session:
-            user = model.User(telegram_id=self.TEST_TELEGRAM_ID)
-            appointment_1 = model.Appointment(
-                name=self.TEST_APPOINTMENT_1,
-                label="Something Important 1",
-                identifier=self.TEST_APPOINTMENT_1_IDENTIFIER,
-            )
-            appointment_2 = model.Appointment(
-                name=self.TEST_APPOINTMENT_2,
-                label="Something Important 2",
-                identifier=self.TEST_APPOINTMENT_2_IDENTIFIER,
-            )
-            model.Appointment(
-                name=self.TEST_APPOINTMENT_3,
-                label="Something Important 3",
-                identifier=self.TEST_APPOINTMENT_3_IDENTIFIER,
-            )
-            model.Termin(appointment=appointment_1, user=user)
-            model.Termin(appointment=appointment_2, user=user)
+        user = model.User(telegram_id=self.TEST_TELEGRAM_ID)
+        appointment_1 = model.Appointment(
+            name=self.TEST_APPOINTMENT_1,
+            label="Something Important 1",
+            identifier=self.TEST_APPOINTMENT_1_IDENTIFIER,
+        )
+        appointment_2 = model.Appointment(
+            name=self.TEST_APPOINTMENT_2,
+            label="Something Important 2",
+            identifier=self.TEST_APPOINTMENT_2_IDENTIFIER,
+        )
+        model.Appointment(
+            name=self.TEST_APPOINTMENT_3,
+            label="Something Important 3",
+            identifier=self.TEST_APPOINTMENT_3_IDENTIFIER,
+        )
+        model.Termin(appointment=appointment_1, user=user)
+        model.Termin(appointment=appointment_2, user=user)
 
     def test_find_user_termins(self):
-        result = model.find_user_appointments(self.TEST_TELEGRAM_ID)
+        result = model.find_user_subscriptions(self.TEST_TELEGRAM_ID)
         self.assertEqual(2, len(result))
-        self.assertTrue(self.TEST_APPOINTMENT_1 in result)
-        self.assertTrue(self.TEST_APPOINTMENT_2 in result)
+        self.assertTrue(self.TEST_APPOINTMENT_1 in [r.label for r in result])
+        self.assertTrue(self.TEST_APPOINTMENT_2 in [r.label for r in result])
 
     def test_remove_user_appointment(self):
         model.remove_user_appointment(self.TEST_TELEGRAM_ID, self.TEST_APPOINTMENT_1)
 
-        result = model.find_user_appointments(self.TEST_TELEGRAM_ID)
+        result = model.find_user_subscriptions(self.TEST_TELEGRAM_ID)
         self.assertEqual(1, len(result))
-        self.assertEqual(self.TEST_APPOINTMENT_2, result[0])
+        self.assertEqual(self.TEST_APPOINTMENT_2, result[0].label)
 
     def test_delete_user(self):
         model.delete_user(self.TEST_TELEGRAM_ID)
@@ -74,7 +74,7 @@ class TestModels(unittest.TestCase):
 
     def test_add_user_appointment(self):
         model.add_user_appointment(self.TEST_TELEGRAM_ID, self.TEST_APPOINTMENT_3)
-        result = model.find_user_appointments(self.TEST_TELEGRAM_ID)
+        result = model.find_user_subscriptions(self.TEST_TELEGRAM_ID)
         self.assertEqual(3, len(result))
 
         with self.assertRaises(MaxTerminException):
