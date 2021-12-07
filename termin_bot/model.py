@@ -1,8 +1,12 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from pony.orm import Database, PrimaryKey, Required, Set, db_session, select
 
+from termin_bot.exceptions import MaxTerminException, NoUserException
 from termin_bot.scraper import ScrapedAppointment
+
+MAX_TERMINS = 3
+
 
 db = Database()
 
@@ -46,16 +50,34 @@ def find_users_for_appointment(appointment_identifier: int) -> list[User]:
 
 @db_session
 def find_user_appointments(telegram_id: int) -> List[str]:
-    user = find_user(telegram_id)
+    user = _find_user(telegram_id)
 
     return [t.appointment.name for t in user.termins]
 
 
 @db_session
-def remove_user_appointment(telegram_id: int, appointment: str):
-    user = find_user(telegram_id)
+def add_user_appointment(telegram_id: int, appointment_identifier: str):
+    user = _find_user(telegram_id)
+    if not user:
+        user = User(telegram_id=telegram_id)
+
+    if len(user.termins) >= MAX_TERMINS:
+        raise MaxTerminException(
+            f"{user.telegram_id} already has {len(user.termins)}/{MAX_TERMINS} termins"
+        )
+
+    appointment = _find_appointment(appointment_identifier)
+    Termin(appointment=appointment, user=user)
+
+
+@db_session
+def remove_user_appointment(telegram_id: int, appointment_identifier: str):
+    user = _find_user(telegram_id)
+    if not user:
+        return
+
     for termin in user.termins:
-        if appointment == termin.appointment.name:
+        if appointment_identifier == termin.appointment.name:
             termin.delete()
 
 
@@ -94,10 +116,10 @@ def fetch_appointments() -> Dict[str, str]:
     return {a.name: a.label for a in Appointment.select()}
 
 
-def _find_user(telegram_id: int) -> User:
+def _find_appointment(appointment: str) -> Appointment:
+    return Appointment.get(name=appointment)
+
+
+def _find_user(telegram_id: int) -> Optional[User]:
     user = User.get(telegram_id=telegram_id)
-
-    if not user:
-        raise ValueError(f"No user found with username {telegram_id}")
-
     return user

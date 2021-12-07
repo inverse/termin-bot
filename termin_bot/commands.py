@@ -43,7 +43,7 @@ Available commands:
 \- `/list` \- see available appointment
 \- `/subscribe` \- subscribe to appointment
 \- `/unsubscribe` \- unsubscribe from an appointment
-\- `/subscribed` \- view your subscriptions
+\- `/subscriptions` \- view your subscriptions
 \- `/uninstall` \- remove all saved state
     """
 
@@ -77,7 +77,8 @@ def command_subscribe(update: Update, context: CallbackContext):
 
         return
 
-    # TODO: Model logic
+    telegram_id = update.effective_user.id
+    model.add_user_appointment(telegram_id, appointment)
 
     update.message.reply_text(f"Successfully subscribed to {appointment}")
 
@@ -90,7 +91,8 @@ def command_unsubscribe(update: Update, context: CallbackContext):
 
     appointment = context.args[0]
 
-    # TODO: Model logic
+    telegram_id = update.effective_user.id
+    model.remove_user_appointment(telegram_id, appointment)
 
     update.message.reply_text(f"Successfully subscribed to {appointment}")
 
