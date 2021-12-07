@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional
 
-from pony.orm import Database, PrimaryKey, Required, Set, db_session, select
+from pony.orm import Database, PrimaryKey, Required, Set, select
 
 from termin_bot.exceptions import MaxTerminException
 from termin_bot.scraper import ScrapedAppointment

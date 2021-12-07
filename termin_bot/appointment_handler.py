@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from telegram.ext import ExtBot
@@ -5,6 +6,8 @@ from telegram.ext import ExtBot
 from termin_bot import common, model, scraper
 from termin_bot.message import get_notification_message
 from termin_bot.scraper import AppointmentResult
+
+logger = logging.getLogger(__name__)
 
 
 def handle_appointments(appointments: List[int]):

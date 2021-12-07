@@ -31,9 +31,7 @@ def bot():
     dispatcher.add_handler(CommandHandler(Commands.START, command_start))
     dispatcher.add_handler(CommandHandler(Commands.LIST, command_list))
     dispatcher.add_handler(CommandHandler(Commands.SUBSCRIBE, command_subscribe))
-    dispatcher.add_handler(
-        CommandHandler(Commands.UNSUBSCRIBE, command_unsubscribe)
-    )
+    dispatcher.add_handler(CommandHandler(Commands.UNSUBSCRIBE, command_unsubscribe))
     dispatcher.add_handler(
         CommandHandler(Commands.SUBSCRIPTIONS, command_subscriptions)
     )

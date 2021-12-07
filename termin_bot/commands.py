@@ -1,5 +1,6 @@
 from typing import Dict
 
+from pony.orm import db_session
 from telegram import Update
 from telegram.ext import CallbackContext
 
@@ -50,6 +51,7 @@ Available commands:
     update.message.reply_markdown_v2(welcome_text)
 
 
+@db_session
 def command_list(update: Update, _context: CallbackContext):
     type_text = ""
     for command, label in APPOINTMENTS.get_commands_dict().items():
@@ -62,6 +64,7 @@ Here are the available types:
     update.message.reply_markdown_v2(_format_text(list_text))
 
 
+@db_session
 def command_subscribe(update: Update, context: CallbackContext):
     if len(context.args) == 0:
         update.message.reply_text("You must provide appointment")
@@ -83,6 +86,7 @@ def command_subscribe(update: Update, context: CallbackContext):
     update.message.reply_text(f"Successfully subscribed to {appointment}")
 
 
+@db_session
 def command_unsubscribe(update: Update, context: CallbackContext):
     if len(context.args) == 0:
         update.message.reply_text("You must provide appointment")
@@ -97,6 +101,7 @@ def command_unsubscribe(update: Update, context: CallbackContext):
     update.message.reply_text(f"Successfully subscribed to {appointment}")
 
 
+@db_session
 def command_subscriptions(update: Update, _context: CallbackContext):
     telegram_id = update.effective_user.id
     termins = model.find_user_subscriptions(telegram_id)
@@ -114,6 +119,7 @@ Here are all your subscriptions:
     update.message.reply_markdown_v2(_format_text(termins_text))
 
 
+@db_session
 def command_uninstall(update: Update, _context: CallbackContext):
     telegram_id = update.effective_user.id
 
