@@ -61,8 +61,7 @@ class TestModels(unittest.TestCase):
 
     def test_delete_user(self):
         model.delete_user(self.TEST_TELEGRAM_ID)
-        with self.assertRaises(NoUserException):
-            model.find_user(self.TEST_TELEGRAM_ID)
+        self.assertIsNone(model.find_user(self.TEST_TELEGRAM_ID))
 
     def test_find_appointments(self):
         result = model.find_appointments()

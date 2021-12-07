@@ -1,9 +1,9 @@
 from typing import List
 
-from message import get_notification_message
 from telegram.ext import ExtBot
 
 from termin_bot import common, model, scraper
+from termin_bot.message import get_notification_message
 from termin_bot.scraper import AppointmentResult
 
 

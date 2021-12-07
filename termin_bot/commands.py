@@ -43,7 +43,7 @@ Available commands:
 \- `/list` \- see available appointment
 \- `/subscribe` \- subscribe to appointment
 \- `/unsubscribe` \- unsubscribe from an appointment
-\- `/subscribed` \- view your subscriptions
+\- `/subscriptions` \- view your subscriptions
 \- `/uninstall` \- remove all saved state
     """
 
