@@ -36,6 +36,7 @@ def setup_database(location: str):
     db.generate_mapping(create_tables=True)
 
 
+@db_session
 def find_users_for_appointment(appointment_identifier: int) -> list[User]:
     query = select(
         u
@@ -47,6 +48,7 @@ def find_users_for_appointment(appointment_identifier: int) -> list[User]:
     return query.fetch()
 
 
+@db_session
 def find_user_subscriptions(telegram_id: int) -> List[Appointment]:
     user = _find_user(telegram_id)
 
@@ -56,6 +58,7 @@ def find_user_subscriptions(telegram_id: int) -> List[Appointment]:
     return [t.appointment for t in user.termins]
 
 
+@db_session
 def add_user_appointment(telegram_id: int, appointment_identifier: str):
     user = _find_user(telegram_id)
     if not user:
@@ -70,6 +73,7 @@ def add_user_appointment(telegram_id: int, appointment_identifier: str):
     Termin(appointment=appointment, user=user)
 
 
+@db_session
 def remove_user_appointment(telegram_id: int, appointment_identifier: str):
     user = _find_user(telegram_id)
     if not user:
@@ -80,6 +84,7 @@ def remove_user_appointment(telegram_id: int, appointment_identifier: str):
             termin.delete()
 
 
+@db_session
 def delete_user(telegram_id: int):
     try:
         user = User.get(telegram_id=telegram_id)
@@ -88,14 +93,17 @@ def delete_user(telegram_id: int):
         pass
 
 
+@db_session
 def find_user(telegram_id: int) -> Optional[User]:
     return _find_user(telegram_id)
 
 
+@db_session
 def find_appointments() -> List[int]:
     return [t.appointment.identifier for t in Termin.select()]
 
 
+@db_session
 def update_appointments(appointments: List[ScrapedAppointment]):
     for appointment in appointments:
         Appointment(
@@ -106,6 +114,7 @@ def update_appointments(appointments: List[ScrapedAppointment]):
         db.commit()
 
 
+@db_session
 def fetch_appointments() -> Dict[str, str]:
     return {a.name: a.label for a in Appointment.select()}
 

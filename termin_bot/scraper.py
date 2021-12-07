@@ -30,7 +30,11 @@ def fetch_available_appointments(appointments: List[int]) -> List[AppointmentRes
     results = []
     for appointment in appointments:
         appointment_url = f"{APPOINTMENTS_URL}{appointment}"
+        logger.debug(f"Scraping appointments for {appointment_url}")
         free_appointments = scrape(appointment_url)
+        logger.debug(
+            f"Found {len(free_appointments)} appointments for {appointment_url}"
+        )
         if len(free_appointments) != 0:
             results.append(
                 AppointmentResult(appointment, appointment_url, free_appointments)
