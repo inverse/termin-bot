@@ -2,7 +2,11 @@ from typing import Dict, List
 
 from pony.orm import Database, PrimaryKey, Required, Set, db_session, select
 
+from termin_bot.exceptions import MaxTerminException, NoUserException
 from termin_bot.scraper import ScrapedAppointment
+
+MAX_TERMINS = 3
+
 
 db = Database()
 
@@ -52,10 +56,22 @@ def find_user_appointments(telegram_id: int) -> List[str]:
 
 
 @db_session
-def remove_user_appointment(telegram_id: int, appointment: str):
-    user = find_user(telegram_id)
+def add_user_appointment(telegram_id: int, appointment_identifier: str):
+    user = _find_user(telegram_id)
+    if len(user.termins) >= MAX_TERMINS:
+        raise MaxTerminException(
+            f"{user.telegram_id} already has {len(user.termins)}/{MAX_TERMINS} termins"
+        )
+
+    appointment = _find_appointment(appointment_identifier)
+    Termin(appointment=appointment, user=user)
+
+
+@db_session
+def remove_user_appointment(telegram_id: int, appointment_identifier: str):
+    user = _find_user(telegram_id)
     for termin in user.termins:
-        if appointment == termin.appointment.name:
+        if appointment_identifier == termin.appointment.name:
             termin.delete()
 
 
@@ -94,10 +110,14 @@ def fetch_appointments() -> Dict[str, str]:
     return {a.name: a.label for a in Appointment.select()}
 
 
+def _find_appointment(appointment: str) -> Appointment:
+    return Appointment.get(name=appointment)
+
+
 def _find_user(telegram_id: int) -> User:
     user = User.get(telegram_id=telegram_id)
 
     if not user:
-        raise ValueError(f"No user found with username {telegram_id}")
+        raise NoUserException(f"No user found with username {telegram_id}")
 
     return user
