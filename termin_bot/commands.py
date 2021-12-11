@@ -1,25 +1,11 @@
-from typing import Dict
-
+from exceptions import MaxTerminException
 from pony.orm import db_session
 from telegram import Update
 from telegram.ext import CallbackContext
 
-from exceptions import MaxTerminException
 from termin_bot import model
 
-
-class Appointments:
-    def __init__(self, data: Dict[str, str]):
-        self.data = data
-
-    def get_commands(self) -> list:
-        return list(self.data.keys())
-
-    def get_commands_dict(self) -> dict:
-        return self.data
-
-
-APPOINTMENTS = Appointments(model.fetch_appointments())
+APPOINTMENTS = model.Appointments(model.fetch_appointments())
 
 
 class Commands:
@@ -53,9 +39,12 @@ Available commands:
 
 
 @db_session
-def command_list(update: Update, _context: CallbackContext):
+def command_list(update: Update, context: CallbackContext):
+
+    page = int(context.args[0] if len(context.args) > 0 else 0)
+
     type_text = ""
-    for command, label in APPOINTMENTS.get_commands_dict().items():
+    for command, label in APPOINTMENTS.get_paginated_appointments(page):
         type_text += f"- `{command}` ({label})\n"
 
     list_text = f"""
@@ -74,7 +63,7 @@ def command_subscribe(update: Update, context: CallbackContext):
 
     appointment = context.args[0]
 
-    if appointment not in APPOINTMENTS.get_commands():
+    if appointment not in APPOINTMENTS.get_appointment_names():
         update.message.reply_text(
             f"{appointment} not in list of available appointments"
         )
@@ -85,7 +74,9 @@ def command_subscribe(update: Update, context: CallbackContext):
     try:
         model.add_user_appointment(telegram_id, appointment)
     except MaxTerminException as e:
-        update.message.reply_text(f"You have already subscribed to {e.max_value} termins")
+        update.message.reply_text(
+            f"You have already subscribed to {e.max_value} termins"
+        )
 
         return
 

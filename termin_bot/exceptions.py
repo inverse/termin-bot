@@ -7,4 +7,3 @@ class MaxTerminException(TerminBotException):
 
     def __init__(self, max_value: int):
         self.max_value = max_value
-

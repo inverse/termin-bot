@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from pony.orm import Database, PrimaryKey, Required, Set, select
 
@@ -104,8 +104,8 @@ def update_appointments(appointments: List[ScrapedAppointment]):
         db.commit()
 
 
-def fetch_appointments() -> Dict[str, str]:
-    return {a.name: a.label for a in Appointment.select()}
+def fetch_appointments() -> List[Dict[str, str]]:
+    return [{a.name: a.label} for a in Appointment.select()]
 
 
 def _find_appointment(appointment: str) -> Appointment:
@@ -115,3 +115,22 @@ def _find_appointment(appointment: str) -> Appointment:
 def _find_user(telegram_id: int) -> Optional[User]:
     user = User.get(telegram_id=telegram_id)
     return user
+
+
+class Appointments:
+    DEFAULT_PAGE_SIZE = 10
+
+    def __init__(self, data: List[Dict[str, str]]):
+        self.data = data
+        self.appointments = [k for d in data for k in d]
+
+    def get_appointment_names(self) -> list:
+        return self.appointments
+
+    def get_paginated_appointments(
+        self, page: int, page_size: int = DEFAULT_PAGE_SIZE
+    ) -> List[Dict[str, str]]:
+        start = page * page_size
+        end = start + page_size
+
+        return self.data[start:end]
