@@ -62,9 +62,7 @@ def add_user_appointment(telegram_id: int, appointment_identifier: str):
         user = User(telegram_id=telegram_id)
 
     if len(user.termins) >= MAX_TERMINS:
-        raise MaxTerminException(
-            f"{user.telegram_id} already has {len(user.termins)}/{MAX_TERMINS} termins"
-        )
+        raise MaxTerminException(MAX_TERMINS)
 
     appointment = _find_appointment(appointment_identifier)
     Termin(appointment=appointment, user=user)

@@ -4,6 +4,7 @@ from pony.orm import db_session
 from telegram import Update
 from telegram.ext import CallbackContext
 
+from exceptions import MaxTerminException
 from termin_bot import model
 
 
@@ -81,7 +82,12 @@ def command_subscribe(update: Update, context: CallbackContext):
         return
 
     telegram_id = update.effective_user.id
-    model.add_user_appointment(telegram_id, appointment)
+    try:
+        model.add_user_appointment(telegram_id, appointment)
+    except MaxTerminException as e:
+        update.message.reply_text(f"You have already subscribed to {e.max_value} termins")
+
+        return
 
     update.message.reply_text(f"Successfully subscribed to {appointment}")
 
