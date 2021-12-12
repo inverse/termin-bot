@@ -1,4 +1,5 @@
-from typing import Dict, List, Optional, Tuple
+from math import ceil
+from typing import Dict, List, Optional
 
 from pony.orm import Database, PrimaryKey, Required, Set, select
 
@@ -121,11 +122,12 @@ class Appointments:
     DEFAULT_PAGE_SIZE = 10
 
     def __init__(self, data: List[Dict[str, str]]):
-        self.data = data
-        self.appointments = [k for d in data for k in d]
+        self._data = data
+        self._appointments = [k for d in data for k in d]
+        self.total: int = len(data)
 
     def get_appointment_names(self) -> list:
-        return self.appointments
+        return self._appointments
 
     def get_paginated_appointments(
         self, page: int, page_size: int = DEFAULT_PAGE_SIZE
@@ -133,4 +135,7 @@ class Appointments:
         start = page * page_size
         end = start + page_size
 
-        return self.data[start:end]
+        return self._data[start:end]
+
+    def get_total_page_sizes(self, page_size: int = DEFAULT_PAGE_SIZE) -> int:
+        return ceil(self.total / page_size)

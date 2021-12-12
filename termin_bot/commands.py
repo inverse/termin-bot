@@ -25,10 +25,12 @@ Hi {user.name},
 
 Welcome to the Berlin Termin Bot\!
 
-A place where you can get notified for free appointments on the Berlin Services website\.
+A place where you can get notified for free appointments on the Berlin Services website\.\
+
+Use the `/list` command to view available appointments, then pass the appointment slug to the `/subscribe` command
 
 Available commands:
-\- `/list` \- see available appointment
+\- `/list <page-number>` \- see available appointment - pass page-number to view a particular page
 \- `/subscribe` \- subscribe to appointment
 \- `/unsubscribe` \- unsubscribe from an appointment
 \- `/subscriptions` \- view your subscriptions
@@ -42,14 +44,25 @@ Available commands:
 def command_list(update: Update, context: CallbackContext):
 
     page = int(context.args[0] if len(context.args) > 0 else 0)
+    total_pages = APPOINTMENTS.get_total_page_sizes()
+
+    if page < 0 or page > total_pages:
+        update.message.reply_text(
+            f"Please provide page-number greater than 0 and less than {total_pages+1}"
+        )
+
+        return
 
     type_text = ""
-    for command, label in APPOINTMENTS.get_paginated_appointments(page):
-        type_text += f"- `{command}` ({label})\n"
+    for appointments in APPOINTMENTS.get_paginated_appointments(page):
+        for command, label in appointments.items():
+            type_text += f"- `{command}` ({label})\n"
 
     list_text = f"""
 Here are the available types:
 {type_text}
+
+Page {page}/{total_pages}
     """
     update.message.reply_markdown_v2(_format_text(list_text))
 
