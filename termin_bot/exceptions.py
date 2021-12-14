@@ -3,4 +3,7 @@ class TerminBotException(Exception):
 
 
 class MaxTerminException(TerminBotException):
-    pass
+    max_value: int
+
+    def __init__(self, max_value: int):
+        self.max_value = max_value

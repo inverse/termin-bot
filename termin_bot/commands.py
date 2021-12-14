@@ -1,24 +1,11 @@
-from typing import Dict
-
+from exceptions import MaxTerminException
 from pony.orm import db_session
 from telegram import Update
 from telegram.ext import CallbackContext
 
 from termin_bot import model
 
-
-class Appointments:
-    def __init__(self, data: Dict[str, str]):
-        self.data = data
-
-    def get_commands(self) -> list:
-        return list(self.data.keys())
-
-    def get_commands_dict(self) -> dict:
-        return self.data
-
-
-APPOINTMENTS = Appointments(model.fetch_appointments())
+APPOINTMENTS = model.Appointments(model.fetch_appointments())
 
 
 class Commands:
@@ -38,10 +25,12 @@ Hi {user.name},
 
 Welcome to the Berlin Termin Bot\!
 
-A place where you can get notified for free appointments on the Berlin Services website\.
+A place where you can get notified for free appointments on the Berlin Services website\.\
+
+Use the `/list` command to view available appointments, then pass the appointment slug to the `/subscribe` command
 
 Available commands:
-\- `/list` \- see available appointment
+\- `/list <page-number>` \- see available appointment - pass page-number to view a particular page
 \- `/subscribe` \- subscribe to appointment
 \- `/unsubscribe` \- unsubscribe from an appointment
 \- `/subscriptions` \- view your subscriptions
@@ -52,14 +41,28 @@ Available commands:
 
 
 @db_session
-def command_list(update: Update, _context: CallbackContext):
+def command_list(update: Update, context: CallbackContext):
+
+    page = int(context.args[0] if len(context.args) > 0 else 0)
+    total_pages = APPOINTMENTS.get_total_page_sizes()
+
+    if page < 0 or page > total_pages:
+        update.message.reply_text(
+            f"Please provide page-number greater than 0 and less than {total_pages+1}"
+        )
+
+        return
+
     type_text = ""
-    for command, label in APPOINTMENTS.get_commands_dict().items():
-        type_text += f"- `{command}` ({label})\n"
+    for appointments in APPOINTMENTS.get_paginated_appointments(page):
+        for command, label in appointments.items():
+            type_text += f"- `{command}` ({label})\n"
 
     list_text = f"""
 Here are the available types:
 {type_text}
+
+Page {page}/{total_pages}
     """
     update.message.reply_markdown_v2(_format_text(list_text))
 
@@ -73,7 +76,7 @@ def command_subscribe(update: Update, context: CallbackContext):
 
     appointment = context.args[0]
 
-    if appointment not in APPOINTMENTS.get_commands():
+    if appointment not in APPOINTMENTS.get_appointment_names():
         update.message.reply_text(
             f"{appointment} not in list of available appointments"
         )
@@ -81,7 +84,14 @@ def command_subscribe(update: Update, context: CallbackContext):
         return
 
     telegram_id = update.effective_user.id
-    model.add_user_appointment(telegram_id, appointment)
+    try:
+        model.add_user_appointment(telegram_id, appointment)
+    except MaxTerminException as e:
+        update.message.reply_text(
+            f"You have already subscribed to {e.max_value} termins"
+        )
+
+        return
 
     update.message.reply_text(f"Successfully subscribed to {appointment}")
 

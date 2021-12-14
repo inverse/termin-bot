@@ -1,3 +1,4 @@
+from math import ceil
 from typing import Dict, List, Optional
 
 from pony.orm import Database, PrimaryKey, Required, Set, select
@@ -62,9 +63,7 @@ def add_user_appointment(telegram_id: int, appointment_identifier: str):
         user = User(telegram_id=telegram_id)
 
     if len(user.termins) >= MAX_TERMINS:
-        raise MaxTerminException(
-            f"{user.telegram_id} already has {len(user.termins)}/{MAX_TERMINS} termins"
-        )
+        raise MaxTerminException(MAX_TERMINS)
 
     appointment = _find_appointment(appointment_identifier)
     Termin(appointment=appointment, user=user)
@@ -106,8 +105,8 @@ def update_appointments(appointments: List[ScrapedAppointment]):
         db.commit()
 
 
-def fetch_appointments() -> Dict[str, str]:
-    return {a.name: a.label for a in Appointment.select()}
+def fetch_appointments() -> List[Dict[str, str]]:
+    return [{a.name: a.label} for a in Appointment.select()]
 
 
 def _find_appointment(appointment: str) -> Appointment:
@@ -117,3 +116,26 @@ def _find_appointment(appointment: str) -> Appointment:
 def _find_user(telegram_id: int) -> Optional[User]:
     user = User.get(telegram_id=telegram_id)
     return user
+
+
+class Appointments:
+    DEFAULT_PAGE_SIZE = 10
+
+    def __init__(self, data: List[Dict[str, str]]):
+        self._data = data
+        self._appointments = [k for d in data for k in d]
+        self.total: int = len(data)
+
+    def get_appointment_names(self) -> list:
+        return self._appointments
+
+    def get_paginated_appointments(
+        self, page: int, page_size: int = DEFAULT_PAGE_SIZE
+    ) -> List[Dict[str, str]]:
+        start = page * page_size
+        end = start + page_size
+
+        return self._data[start:end]
+
+    def get_total_page_sizes(self, page_size: int = DEFAULT_PAGE_SIZE) -> int:
+        return ceil(self.total / page_size)

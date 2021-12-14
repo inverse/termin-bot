@@ -79,3 +79,85 @@ class TestModels(unittest.TestCase):
 
         with self.assertRaises(MaxTerminException):
             model.add_user_appointment(self.TEST_TELEGRAM_ID, self.TEST_APPOINTMENT_3)
+
+
+class TestAppointments(unittest.TestCase):
+    def test_get_appointments_empty(self):
+        appointments = model.Appointments([])
+        self.assertEqual([], appointments.get_appointment_names())
+
+    def test_get_paginated_appointments_empty(self):
+        appointments = model.Appointments([])
+        self.assertEqual([], appointments.get_paginated_appointments(0))
+
+    def test_get_total_page_sizes_empty(self):
+        appointments = model.Appointments([])
+        self.assertEqual(0, appointments.get_total_page_sizes())
+
+    def test_get_paginated_appointments_paged(self):
+        appointments = model.Appointments(
+            [
+                {"a": "label-a"},
+                {"b": "label-b"},
+                {"c": "label-c"},
+            ]
+        )
+        self.assertEqual(
+            [{"a": "label-a"}], appointments.get_paginated_appointments(0, 1)
+        )
+        self.assertEqual(
+            [{"b": "label-b"}], appointments.get_paginated_appointments(1, 1)
+        )
+        self.assertEqual(
+            [{"c": "label-c"}], appointments.get_paginated_appointments(2, 1)
+        )
+
+    def test_get_paginated_appointments_under(self):
+        appointments = model.Appointments(
+            [
+                {"a": "label-a"},
+                {"b": "label-b"},
+                {"c": "label-c"},
+            ]
+        )
+        self.assertEqual([], appointments.get_paginated_appointments(-1, 1))
+
+    def test_get_paginated_appointments_over(self):
+        appointments = model.Appointments(
+            [
+                {"a": "label-a"},
+                {"b": "label-b"},
+                {"c": "label-c"},
+            ]
+        )
+        self.assertEqual([], appointments.get_paginated_appointments(3, 1))
+
+    def test_get_total_page_sizes(self):
+        appointments = model.Appointments(
+            [
+                {"a": "label-a"},
+                {"b": "label-b"},
+                {"c": "label-c"},
+            ]
+        )
+        self.assertEqual(3, appointments.get_total_page_sizes(1))
+
+    def test_get_total_page_sizes_total(self):
+        appointments = model.Appointments(
+            [
+                {"a": "label-a"},
+                {"b": "label-b"},
+                {"c": "label-c"},
+            ]
+        )
+        self.assertEqual(1, appointments.get_total_page_sizes(3))
+
+    def test_get_total_page_sizes_bigger_page_size(self):
+        appointments = model.Appointments(
+            [
+                {"a": "label-a"},
+                {"b": "label-b"},
+                {"c": "label-c"},
+            ]
+        )
+        self.assertEqual(1, appointments.get_total_page_sizes(4))
